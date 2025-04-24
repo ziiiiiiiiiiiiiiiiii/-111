@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>翻轉小卡</title>
+
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+    <script src="https://openprocessing.org/openprocessing_sketch.js"></script>
+
+	<script src="https://q5js.org/q5.js"></script>
+
+	<script src="mySketch.js"></script>
+	
+	<link rel="stylesheet" type="text/css" href="style.css">
+    <style>
+      .card-container {
+        perspective: 1000px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 300px;
+        height: 200px;
+        display: none;
+      }
+
+      .card {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transform-style: preserve-3d;
+        transition: transform 0.6s;
+      }
+
+      .card.flip {
+        transform: rotateY(180deg);
+      }
+
+      .card .front,
+      .card .back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 20px;
+        font-family: Arial, sans-serif;
+        color: white;
+        flex-direction: column;
+      }
+
+      .card .front {
+        background: #4caf50;
+      }
+
+      .card .back {
+        background: #2196f3;
+        transform: rotateY(180deg);
+      }
+
+      .close-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: red;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      .video-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80%;
+        height: 80%;
+        display: none;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 1000;
+      }
+
+      .video-container video {
+        width: 100%;
+        height: 100%;
+      }
+
+      .close-video-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: red;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+        font-size: 14px;
+        z-index: 1001;
+      }
+
+      .menu ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .menu ul li {
+        display: inline-block;
+        position: relative;
+        margin-right: 10px;
+      }
+
+      .menu ul li ul.submenu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background: #f9f9f9;
+        padding: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      }
+
+      .menu ul li:hover ul.submenu {
+        display: block;
+      }
+
+      .menu ul li ul.submenu li {
+        display: block;
+        margin: 5px 0;
+      }
+
+      #intro-box {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 300px;
+        height: 200px;
+        background: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        padding: 20px;
+        text-align: center;
+        font-family: Arial, sans-serif;
+        font-size: 16px;
+        color: black;
+        transform-style: preserve-3d;
+        transition: transform 0.6s;
+      }
+
+      #intro-box .front,
+      #intro-box .back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      #intro-box .back {
+        transform: rotateY(180deg);
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav class="menu">
+      <ul>
+        <li><a href="#" onclick="hideIframe()">首頁</a></li>
+        <li><a href="#" onclick="showIntro()">自我介紹</a></li>
+        <li>
+          <a href="#">作品集</a>
+          <ul class="submenu">
+            <li><a href="#" onclick="loadIframe(' https://ziiiiiiiiiiiiiiiiii.github.io/-11/')">第一周</a></li>
+            <li><a href="#" onclick="loadIframe('https://hackmd.io/@ziiiiiiiii/SkD3uXWnyg')">第二周</a></li>
+            <li><a href="#" onclick="loadIframe('  https://ziiiiiiiiiiiiiiiiii.github.io/3-14/')">第三周</a></li>
+            <li><a href="#" onclick="loadIframe('https://hackmd.io/@ziiiiiiiii/rJIJ5cVJle')">第四周</a></li>
+          </ul>
+        </li>
+        <li><a href="#" onclick="showVideo()">教學影片</a></li>
+        <li><a href="#" onclick="loadIframe('https://ziiiiiiiiiiiiiiiiii.github.io/321/')">測驗卷</a></li>
+      </ul>
+    </nav>
+    
+    <div class="video-container" id="video-container"> // 影片容器
+      <button class="close-video-button" onclick="hideVideo()">關閉</button>//
+      <video id="teaching-video" controls>S
+        <source src="https://cfchen58.synology.me/%E7%A8%8B%E5%BC%8F%E8%A8%882024/A2/week1/20250221_092037.mp4" type="video/mp4">
+        您的瀏覽器不支援影片播放。
+      </video>
+    </div>
+
+    <div id="intro-box" onclick="flipIntroBox()">
+      <div class="front" style="display: flex; justify-content: space-between; align-items: center; height: 100%;">
+        <img src="./photo.jpg" alt="自我介紹照片" style="width: 40%; height: auto; max-height: 100%; object-fit: cover; border-radius: 8px;">
+        <div style="width: 55%; text-align: center;">
+          <p>楊慈秀<br>教科1A<br>自我介紹</p>
+        </div>
+      </div>
+      <div class="back" style="display: flex; justify-content: center; align-items: flex-start; text-align: center; font-size: 23px; padding-top: 10px; padding-left: 10px;"><br>
+        <p>18Y<br>我來自新竹<br>目前就讀淡江大學<br>INTP<br>我讀教科系</p>
+      </div>
+      <button onclick="closeIntroBox()" style="position: absolute; bottom: 10px; left: 60%; transform: translateX(-50%);">關閉</button> 
+    </div>
+
+    <iframe id="content-frame" src="" frameborder="0"></iframe>
+    <script src="sketch.js"></script>
+    <script>
+      function loadIframe(url) {
+        const iframe = document.getElementById('content-frame');
+        iframe.src = url;
+        iframe.classList.add('visible'); // 顯示 iframe
+      }
+
+      function hideIframe() {
+        const iframe = document.getElementById('content-frame');
+        iframe.src = ''; // 清空 iframe 的內容
+        iframe.classList.remove('visible'); // 隱藏 iframe
+      }
+
+      function showVideo() {
+        const videoContainer = document.getElementById('video-container');
+        videoContainer.style.display = 'block';
+      }
+
+      function hideVideo() {
+        const videoContainer = document.getElementById('video-container');
+        videoContainer.style.display = 'none';
+        const video = document.getElementById('teaching-video');
+        video.pause(); // 停止影片播放
+      }
+
+      function showIntro() {
+        const introBox = document.getElementById('intro-box');
+        introBox.style.display = 'block'; // 顯示方框
+      }
+
+      function closeIntroBox() {
+        const introBox = document.getElementById('intro-box');
+        introBox.style.display = 'none'; // 隱藏方框
+        introBox.style.transform = 'rotateY(0deg)'; // 重置翻轉狀態
+      }
+
+      function flipIntroBox() {
+        const introBox = document.getElementById('intro-box');
+        const currentRotation = introBox.style.transform || 'rotateY(0deg)';
+        introBox.style.transform = currentRotation === 'rotateY(0deg)' ? 'rotateY(180deg)' : 'rotateY(0deg)'; // 翻轉動畫
+      }
+    </script>
+  </body>
+</html>
+
